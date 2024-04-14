@@ -1,0 +1,190 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>SDGE - CUrrent Rate</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-family: monospace, sans-serif;
+            background: #eee;
+        }
+
+        .text-xl {
+            font-size: 3rem;
+        }
+
+        .text-lg {
+            font-size: 2rem;
+        }
+
+        .mb-3 {
+            margin-bottom: 1rem;
+        }
+
+        .p-5 {
+            padding: 2rem;
+        }
+
+        .border-1 {
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .bg-white {
+            background-color: white;
+        }
+    </style>
+    <script>
+        var plans = [
+            {
+                type: 'delivery', name: 'SDGE Super Off-Peak', price: 0.063, condition: (month, day, hour, week) => {
+                    // Midnight – 6:00 am
+                    // 10:00 am - 2:00 pm in March and April (Weekdays)
+                    // Midnight - 2:00 pm (Weekends & Holidays)
+                    if (hour >= 0 && hour < 6) return true;
+                    if ((month === 2 || month === 3) && hour >= 10 && hour < 14) return true;
+                    if (isWeekend(week) && hour >= 0 && hour < 14) return true;
+                    return false;
+                }
+            },
+            {
+                type: 'delivery', name: 'SDGE On-Peak', price: 0.287, condition: (month, day, hour, week) => {
+                    // 4:00 pm - 9:00 pm (Everyday)
+                    if (hour >= 16 && hour < 21) return true;
+                    return false;
+                }
+            },
+            {
+                type: 'delivery', name: 'SDGE Off-Peak', price: 0.287, condition: (month, day, hour, week) => {
+                    // All other hours excluding 10:00 am to 2:00 pm on weekdays in March and April
+                    return true;
+                }
+            },
+            // ===
+            {
+                type: 'generation', name: 'CCA Winter Super Off-Peak', price: 0.05266, condition: (month, day, hour, week) => {
+                    if (!isSummer(month)) {
+                        if (hour >= 0 && hour < 6) return true;
+                        if ((month === 2 || month === 3) && hour >= 10 && hour < 14) return true;
+                        if (isWeekend(week) && hour >= 0 && hour < 14) return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                type: 'generation', name: 'CCA Winter On-Peak', price: 0.13026, condition: (month, day, hour, week) => {
+                    if (!isSummer(month)) {
+                        if (hour >= 16 && hour < 21) return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                type: 'generation', name: 'CCA Winter Off-Peak', price: 0.07011, condition: (month, day, hour, week) => {
+                    if (!isSummer(month)) {
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            // ===
+            {
+                type: 'generation', name: 'CCA Summer Super Off-Peak', price: 0.06967, condition: (month, day, hour, week) => {
+                    if (isSummer(month)) {
+                        if (hour >= 0 && hour < 6) return true;
+                        if ((month === 2 || month === 3) && hour >= 10 && hour < 14) return true;
+                        if (isWeekend(week) && hour >= 0 && hour < 14) return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                type: 'generation', name: 'CCA Summer On-Peak', price: 0.46755, condition: (month, day, hour, week) => {
+                    if (isSummer(month)) {
+                        if (hour >= 16 && hour < 21) return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                type: 'generation', name: 'CCA Summer Off-Peak', price: 0.15567, condition: (month, day, hour, week) => {
+                    if (isSummer(month)) {
+                        return true;
+                    }
+                    return false;
+                }
+            },
+        ]
+
+        // ====================
+        
+        function isSummer(month) {
+            return month >= 5 && month <= 10; // jun - oct
+        }
+        function isWeekend(week) {
+            return week === 5 || week === 6
+        }
+        function text(str) {
+            document.write(str)
+        }
+
+        // =====================
+        const now = new Date();
+        const month = now.getMonth();
+        const day = now.getDate();
+        const hour = now.getHours();
+        const week = now.getDay();
+
+        const delivery = plans.filter(p => p.type === 'delivery').find(p => p.condition(month, day, hour, week));
+        const generation = plans.filter(p => p.type === 'generation').find(p => p.condition(month, day, hour, week));
+
+        var rate = {
+            generation: generation?.price,
+            generationPlan: generation?.name,
+            delivery: delivery?.price,
+            deliveryPlan: delivery?.name,
+        }
+    </script>
+</head>
+
+<body>
+    <div class="p-5 border-1 bg-white">
+        <h1 class="text-lg mb-3">
+            Current⚡Rate
+        </h1>
+        <div class="text-xl mb-3">
+            <script>text('$' + Math.round((rate.generation + rate.delivery) * 100) / 100)</script>
+        </div>
+        <div>
+            Generation:
+            <br />
+            <script>text(rate.generationPlan)</script>
+            <b>
+                <script>text(rate.generation)</script>
+            </b>
+
+            <br />
+            <br />
+
+            Delivery:
+            <br />
+            <script>text(rate.deliveryPlan)</script>
+            <b>
+                <script>text(rate.delivery)</script>
+            </b>
+        </div>
+    </div>
+</body>
+
+</html>
