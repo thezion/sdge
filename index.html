@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>SDGE - CUrrent Rate</title>
+    <title>SDGE - Current Rate</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         * {
@@ -128,9 +128,9 @@
         ]
 
         // ====================
-        
+
         function isSummer(month) {
-            return month >= 5 && month <= 10; // jun - oct
+            return month >= 5 && month <= 9; // jun - oct
         }
         function isWeekend(week) {
             return week === 5 || week === 6
@@ -164,7 +164,9 @@
             Current⚡Rate
         </h1>
         <div class="text-xl mb-3">
-            <script>text('$' + Math.round((rate.generation + rate.delivery) * 100) / 100)</script>
+            <b>
+                <script>text('$' + Math.round((rate.generation + rate.delivery) * 100) / 100)</script>
+            </b>
         </div>
         <div>
             Generation:
